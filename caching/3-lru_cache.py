@@ -1,55 +1,32 @@
-
 #!/usr/bin/python3
-""" 3. LRU Caching
-"""
+""" lru cache """
 
-from collections import deque
-
-BaseCaching = __import__("base_caching").BaseCaching
+BaseCaching = __import__('base_caching').BaseCaching
 
 
 class LRUCache(BaseCaching):
-    """ Create a class LRUCache that inherits from BaseCaching and is a caching
-    system
-    """
-
-    def __init__(self):
-        """ Init
-        """
-        super().__init__()
-        self.queue = deque()
+    """ lru cache """
 
     def put(self, key, item):
-        """ Must assign to the dictionary self.cache_data the item value for
-        the key key
-        """
-        if key and item:
-            if key in self.cache_data:
-                self.queue.remove(key)
-            elif self.is_full():
-                self.evict()
-            self.queue.append(key)
-            self.cache_data[key] = item
+        """Add an item in the cache"""
+        if key is None or item is None:
+            return
+        if (key not in self.cache_data and
+                len(self.cache_data) >= BaseCaching.MAX_ITEMS):
+            if self.cache_data:
+                discard = next(iter(self.cache_data))
+                print("DISCARD: {}".format(discard))
+                del self.cache_data[discard]
+        if key in self.cache_data:
+            del self.cache_data[key]
+        self.cache_data[key] = item
 
     def get(self, key):
-        """ Must return the value in self.cache_data linked to key.
-        """
-        if key in self.cache_data:
-            self.queue.remove(key)
-            self.queue.append(key)
-            return self.cache_data.get(key)
-
-    def is_full(self):
-        """ If the number of items in self.cache_data is higher that
-        BaseCaching.MAX_ITEMS
-        """
-        return len(self.cache_data) >= self.MAX_ITEMS
-
-    def evict(self):
-        """ you must print DISCARD: with the key discarded and following by a
-        new line
-        """
-        popped = self.queue.popleft()
-        del self.cache_data[popped]
-        print("DISCARD: " + str(popped))
+        """Get an item in the cache"""
+        if key is None or key not in self.cache_data:
+            return None
+        item = self.cache_data[key]
+        del self.cache_data[key]
+        self.cache_data[key] = item
+        return self.cache_data[key]
         
